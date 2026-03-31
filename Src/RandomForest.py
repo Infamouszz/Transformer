@@ -1,12 +1,10 @@
 from numpy.ma.core import sqrt, count
 import random as rnd
-import Teste as tree
+import BinaryTree as tree
 import numpy as np
 import pandas as pd
 from collections import Counter
 import math
-
-from Src.Teste import TreeBuilder
 
 X_treino = np.array([
     [25, 100, 0],
@@ -17,9 +15,6 @@ X_treino = np.array([
 ])
 X_treino2 = pd.DataFrame(X_treino)
 Y_treino = np.array(["Normal", "Normal", "Infartando", "Infartando", "Normal"]).reshape(-1, 1)
-class Result():
-    def __init__(self, tree_value):
-        self.tree_value = tree_value
 class RandomForest():
     def __init__(self, X, Y):
         self.X = X
@@ -55,7 +50,7 @@ class Bootstrap:
 
 forest = RandomForest(X_treino, Y_treino)
 forest.build_random_forest()
-new_value = np.array([[24, 120, 0]])
+new_value = np.array([[25, 100, 0]])
 random_forest_result = forest.predict_random_forest(new_value)
 print("Resultado random forest: ", random_forest_result)
 

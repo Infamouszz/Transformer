@@ -4,17 +4,6 @@ import numpy as np
 import random as rnd
 
 from numpy.ma.core import sqrt
-
-X_treino = np.array([
-    [25, 100, 0],
-    [45, 70, 0],
-    [30, 168, 1],
-    [65, 130, 1],
-    [22, 96, 0]
-])
-X_treino2 = pd.DataFrame(X_treino)
-Y_treino = np.array(["Normal", "Normal", "Infartando", "Infartando", "Normal"]).reshape(-1, 1)
-
 class Node():
     def __init__(self, threshold: object = None, winner_feature_index: object = None, left_pointer: object = None, right_pointer: object = None,
                  info_gain: object = None,
