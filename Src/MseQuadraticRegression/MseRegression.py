@@ -1,5 +1,7 @@
 import math
 from math import sqrt
+import Visualisation
+
 X_linear = [110.15,98.71,94.91,116.35,108.75,113.32,118.63,101.81,108.73,121.82,148.57,136.29,153.19,164.73,151.76,203,178.5,169.28,194.63,195.38,192.3,191.52,207.64,227.57,226.79,234.46,242.98,216.21,214.58,228.45,222.25,238.35,242.17,252.88,260.58,257.56,284.33,285.12,283.64,298.96,315.07,311.99,322.68,333.47,338.06,350.35,364.91,372.57,387.91,385.61,368.68,355.68,382.49,386.34,398.58,410.82,416.97,409.36,395.6,398.63,410.12,420.87,439.97,442.26,441.55,443.11,458.41,460.73,471.45,479.89,492.91,496.77,528.15,528.18,510.62,535.89,534.39,548.94,554.31,571.93,570.46,598.01,598,599.59,607.25,627.15,626.45,654.01,657.88,660.95,673.97,660.86,650.89,637.82,621.72,607.13,584.9,561.89,562.61,600.18,630.09,653.87,666.19,663.95,540.36,512.01,485.18,455.28,447.58,409.24,382.4,337.2,307.28,296.54,278.88,253.56,236.65,214.4,176.08,152.29,130.05,116.25,141.59,160.01,195.31,253.59]
 Y_linear = [545.8,538.17,532.06,523.66,513.74,517.56,528.24,527.48,516.79,493.89,496.18,506.87,487.02,467.18,460.31,455.73,466.41,477.1,446.56,449.62,455.73,459.54,443.51,428.24,432.82,425.95,397.71,402.29,426.72,398.47,420.61,409.92,410.69,409.16,393.89,383.97,380.15,374.81,362.6,352.67,338.17,345.8,348.09,326.72,325.19,309.92,300,296.18,284.73,285.5,315.27,316.79,301.53,295.42,292.37,290.84,280.92,273.28,272.52,280.92,273.28,261.83,265.65,266.41,252.67,245.04,242.75,235.11,230.53,222.14,217.56,206.11,196.18,190.08,183.97,172.52,164.89,158.78,154.96,145.8,129.77,121.37,125.95,109.92,103.82,98.47,82.44,73.28,59.54,56.49,51.91,81.68,89.31,108.4,120.61,135.11,151.91,170.23,182.44,155.73,129.77,109.92,86.26,70.99,202.29,220.61,237.4,260.31,275.57,305.34,325.19,348.85,377.86,387.79,406.87,429.01,454.96,473.28,499.24,521.37,539.69,551.15,522.14,503.05,469.47,422.9]
 
@@ -27,23 +29,30 @@ def z_score(val):
     return z_scored_val
 
 
-def update_parameters(X, Y, w1, w2, b, alpha_w1,alpha_w2, lasso_lambda):
-    gradient_sum_w1 = 0.0
+def update_parameters(X, Y, w1, w2, w3, w4, b, alpha_w4,alpha_w3, alpha_w2, alpha_w1, lasso_lambda):
+    gradient_sum_w4 = 0
+    gradient_sum_w3= 0.0
     gradient_sum_w2 = 0.0
+    gradient_sum_w1 = 0.0
     gradient_sum_b = 0.0
     N = len(X)
 
     for i in range(N):
+        error_function = Y[i] - (w4 * math.exp(X[i]) + w3 * math.log(abs(X[i]) + 1e-8) + w2 * (X[i] ** 2) + w1 * X[i] + b)
 
-        gradient_sum_w1 += -2* (X[i] ** 2) * (Y[i] - (w1 * (X[i] ** 2) + w2 * X[i] + b))
-        gradient_sum_w2 += -2* X[i] * (Y[i] - (w1 * (X[i] ** 2) + w2 * X[i] + b))
-        gradient_sum_b += -2* (Y[i] - (w1 * (X[i] ** 2) + w2 * X[i] + b))
+        gradient_sum_w4 += -2 * math.exp(X[i]) * error_function
+        gradient_sum_w3 += -2 * math.log(abs(X[i]) + 1e-8) * error_function
+        gradient_sum_w2 += -2 * (X[i] ** 2) * error_function
+        gradient_sum_w1 += -2 * X[i] * error_function
+        gradient_sum_b += -2 * error_function
 
-    w1 = w1 - ((1 / float(N)) * gradient_sum_w1 + apply_lasso(w1, lasso_lambda)) * alpha_w1
+    w4 = w4 - ((1/float(N)) * gradient_sum_w4 + apply_lasso(w4, lasso_lambda)) * alpha_w4
+    w3 = w3 - ((1 / float(N)) * gradient_sum_w3 + apply_lasso(w3, lasso_lambda)) * alpha_w3
     w2 = w2 - ((1 / float(N)) * gradient_sum_w2 + apply_lasso(w2, lasso_lambda)) * alpha_w2
+    w1 = w1 - ((1 / float(N)) * gradient_sum_w1 + apply_lasso(w1, lasso_lambda)) * alpha_w1
     b = b - (1 / float(N)) * gradient_sum_b * alpha_w2
 
-    return w1, w2, b
+    return w4, w3, w2, w1, b
 
 def apply_lasso(weight, lasso_lambda):
     sign = 0
@@ -55,50 +64,66 @@ def apply_lasso(weight, lasso_lambda):
     return lasso_lambda * sign
 
 
-def train(X, Y, w1, w2, b, epoch, alpha_w1, alpha_w2, L1_Lambda):
+def train(X, Y, w1, w2, w3,w4, b, epoch, alpha_w4, alpha_w3, alpha_w2, alpha_w1, L1_Lambda):
+
     for i in range(epoch):
-        w1, w2, b = update_parameters(X, Y, w1, w2, b, alpha_w1, alpha_w2, L1_Lambda)
+        w4, w3, w2, w1, b = update_parameters(X, Y, w1, w2, w3, w4, b, alpha_w4,alpha_w3, alpha_w2, alpha_w1, L1_Lambda)
+        if 0.00001 <= abs(w4) <= 0.01:
+            w4 = 0.0
 
-        if i % 400 == 0:
-            avg_root_mse = sqrt(avg_loss(X, Y, w1, w2, b))
-            print("Epoch: ", i, "Avg Root Loss: ", avg_root_mse, "Normalized Root Loss: ",normalized_root_mse(avg_root_mse, Y))
-            print("W1: ",w1,"W2: ",w2,"B: ", b)
-    weight_sum = abs(w1) + abs(w2)
-    w1_power = (w1/weight_sum) * 100
-    w2_power = (w2/weight_sum) * 100
-    if abs(w1_power) < 5:
-        w1 = 0.0
-    if abs(w2_power) < 5:
-        w2 = 0.0
+        if 0.00001 <= abs(w3) <= 0.01:
+            w3 = 0.0
 
-    print("Finished Training", "W1: ", w1, "W2: ", w2, "B: ", b)
-    return w1, w2, b
+        if i % 400 == 0 or i == epoch-1:
+            avg_root_mse = sqrt(avg_loss(X, Y, w4, w3, w2, w1,b))
+            real_root_loss = real_root_mse(avg_root_mse, Y)
+            print("Epoch: ", i, "Avg Root Loss: ", avg_root_mse, "Real Root Loss: ", real_root_loss)
+            print("W4: ",w4, "W3: ",w3, "W2: ",w2, "W1: ",w1, "B: ", b)
 
-def avg_loss(X, Y, w1, w2, b):
+    weight_sum = abs(w4) + abs(w3) + abs(w2) + abs(w1)
+
+    w1 = weight_power_denier(w1, weight_sum, 5)
+    w2 = weight_power_denier(w2, weight_sum, 5)
+    w3 = weight_power_denier(w3, weight_sum, 5)
+    w4 = weight_power_denier(w4, weight_sum, 5)
+
+    print("Finished Training", "W4: ", w4, "W3: ", w3,"W2: ", w2, "W1: ",w1, "B: ", b)
+    return w4, w3, w2, w1, b, real_root_loss
+
+def weight_power_denier(weight, weight_sum, power_percentage):
+    weight_power_percentage = 0.0
+    if weight != 0:
+        weight_power_percentage = (abs(weight) / weight_sum) * 100
+    if abs(weight_power_percentage) < power_percentage:
+        return 0.0
+    else:
+        return weight
+
+def avg_loss(X, Y, w4, w3, w2, w1, b):
     N = len(X)
     total_error = 0.0
     for i in range(N):
-        total_error += (Y[i] - (w1*(X[i]**2)+w2*X[i]+b))**2
+        total_error += (Y[i] - (w4 * math.exp(X[i]) + w3 * math.log(abs(X[i])) + w2 * (X[i] ** 2) + w1 * X[i] + b))**2
     avg_loss = total_error/float(N)
     return avg_loss
 
-def normalized_root_mse(root_mse, Y):
+def real_root_mse(root_mse, Y):
     max_y, min_y = max(Y), min(Y)
     normalized_root_mse = (root_mse/(max_y-min_y)) * 100
     return normalized_root_mse
 
-
-def predict(X_new, final_w1, final_w2, final_b):
-    return (final_w1*(X_new**2))+(final_w2*X_new)+final_b
+def predict(X_new, final_w4, final_w3, final_w2, final_w1, final_b):
+    return (final_w4 * math.exp(X_new))+(final_w3 * math.log(abs(X_new) + 1e-8))+(final_w2*(X_new**2))+(final_w1*X_new)+final_b
 
 z_score_X = z_score(X_linear)
 z_score_Y = z_score(Y_quadratic)
-w1, w2, b = train(z_score_X, Y_linear, 0.001, 0.001, 0.0, 15000, 0.002, 0.001,0.1)
-X_new = 120
-Y_new = predict(X_new, w1, w2, b)
-normalized_loss = normalized_root_mse(sqrt(avg_loss(z_score_X, Y_linear, w1, w2, b)), Y_linear)
+w4, w3, w2, w1, b, avg_loss_final = train(z_score_X, Y_linear, 0.001, 0.001, 0.001, 0.001, 0.001, 30000, 0.001, 0.001,0.01, 0.1,1)
+X_new = 0.5
+Y_new = predict(X_new, w4, w3, w2, w1, b)
+normalized_loss = real_root_mse(sqrt(avg_loss(z_score_X, Y_linear, w4, w3, w2, w1, b)), Y_linear)
 print("Normalized loss: ",normalized_loss)
 print("Predicted Value: ", Y_new)
 
+Visualisation.plotar(z_score_X, Y_linear, w4, w3, w2, w1, b)
 
 
