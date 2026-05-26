@@ -115,15 +115,15 @@ def real_root_mse(root_mse, Y):
 def predict(X_new, final_w4, final_w3, final_w2, final_w1, final_b):
     return (final_w4 * math.exp(X_new))+(final_w3 * math.log(abs(X_new) + 1e-8))+(final_w2*(X_new**2))+(final_w1*X_new)+final_b
 
-z_score_X = z_score(X_linear)
+z_score_X = z_score(X_quadratic)
 z_score_Y = z_score(Y_quadratic)
-w4, w3, w2, w1, b, avg_loss_final = train(z_score_X, Y_linear, 0.001, 0.001, 0.001, 0.001, 0.001, 30000, 0.001, 0.001,0.01, 0.1,1)
+w4, w3, w2, w1, b, avg_loss_final = train(z_score_X, Y_quadratic, 0.001, 0.001, 0.001, 0.001, 0.001, 30000, 0.001, 0.001,0.01, 0.1,1)
 X_new = 0.5
 Y_new = predict(X_new, w4, w3, w2, w1, b)
-normalized_loss = real_root_mse(sqrt(avg_loss(z_score_X, Y_linear, w4, w3, w2, w1, b)), Y_linear)
+normalized_loss = real_root_mse(sqrt(avg_loss(z_score_X, Y_quadratic, w4, w3, w2, w1, b)), Y_quadratic)
 print("Normalized loss: ",normalized_loss)
 print("Predicted Value: ", Y_new)
 
-Visualisation.plotar(z_score_X, Y_linear, w4, w3, w2, w1, b)
+Visualisation.plotar(z_score_X, Y_quadratic, w4, w3, w2, w1, b)
 
 
