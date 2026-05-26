@@ -3,17 +3,20 @@ import pickle
 import chess.pgn
 import numpy as np
 import sys
+from importlib import resources
+import torch
+
 np.set_printoptions(threshold=sys.maxsize)
 
-pgn = io.StringIO("1.e4 e5 2. d3 Nc6 3. Nc3 Nf6 4. Be3 Bb4 5. a3 Bxc3+ 6. bxc3 O-O 7. Qd2 h6 8.O-O-O $2 d5 9. Nf3 d4 10. cxd4 exd4 11. Nxd4 $6 Nxd4 12. Bf4 Be6 13. Qb4 Qd7 14.c3 $6 Nb3+ 15. Kc2 a5 16. Qxb7 Rab8 17. Qa7 Nxe4 $3 18. dxe4 Na1+ $3 19. Kc1 $4Rb1+ $3 20. Kxb1 Qxd1+ $1 21. Bc1 Qc2+ 22. Kxa1 Qxc1# 0-1")
+pgn = io.StringIO("1. e4 c5 2. Nf3 Nc6 3. Bc4 e6 4. d3 Na5 5. Nc3 Nxc4 6. dxc4 Be7 7. Bf4 a6 8. O-Ob6 9. Ne5 Nf6 10. Qf3 O-O 11. Rfd1 h6 12. Rd3 Ra7 13. Qh3 Nh7 14. Bxh6 gxh6 15.Rg3+ Kh8 16. Qxh6 Rg8 17. Nxf7# 1-0")
 gamec = chess.pgn.read_game(pgn)
 board = gamec.board()
 
 
-with open(r'C:\Users\guilh\PycharmProjects\DashboardAi\Src\NeuralNetwork\ModelsAi\parameters_gen_6.pkl', 'rb') as f:
+with resources.files('ModelsAi').joinpath('parameters_gen_6.pkl').open('rb') as f:
     loaded_parameters = pickle.load(f)
 
-with open(r'C:\Users\guilh\PycharmProjects\DashboardAi\Src\NeuralNetwork\ModelsAi\matrix_y_gen_5.pkl', 'rb') as m:
+with resources.files('ModelsAi').joinpath('matrix_gen_5.pkl').open('rb') as m:
     loaded_matrix = pickle.load(m)
 
 Y = loaded_matrix['Y']
@@ -21,11 +24,11 @@ Y = loaded_matrix['Y']
 W = loaded_parameters['W']
 B = loaded_parameters['B']
 
-X_entered = np.array([[-3.,  6.,  2.,  0.,  0.,  2.,  0.,  4.,  0.,  0., -5.,  0.,  0.,
-         1.,  1.,  1.,  1.,  0.,  1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-         0.,  0.,  1.,  0.,  0.,  0., -1.,  0.,  0.,  0.,  0.,  0.,  0.,
-         0.,  0.,  0.,  0.,  0., -2.,  0.,  0., -1.,  5.,  0., -1.,  0.,
-         0., -1., -1.,  0.,  0.,  0.,  0.,  0.,  0., -4., -6.,  0.,  1.]])
+X_entered = np.array([[ 4.,  0.,  0.,  0.,  0.,  0.,  6.,  0.,  1.,  1.,  1.,  0.,  0.,
+         1.,  1.,  1.,  0.,  0.,  3.,  0.,  0.,  0.,  4.,  0.,  0.,  0.,
+         1.,  0.,  1.,  0.,  0.,  0.,  0.,  0., -1.,  0.,  3.,  0.,  0.,
+         0., -1., -1.,  0.,  0., -1.,  0.,  0.,  5., -4.,  0.,  0., -1.,
+        -2., -1.,  0., -3.,  0.,  0., -2., -5.,  0., -4.,  0., -6.,  0.]])
 X_normalized = X_entered / np.max(X_entered)
 
 def predict_game(X, W, B):
@@ -39,9 +42,19 @@ def predict_game(X, W, B):
         if i < layers - 1:
             A_new = np.maximum(0, Z)
         else:
-            A_new = Z
+            A_new = softmax(Z)
 
     return A_new
+
+def softmax(Z):
+    Z_clamp = np.clip(Z, min = -80.0, max = 80.0)
+
+    Z_shifted = Z_clamp - np.max(Z_clamp, axis = 1, keepdims=True)
+
+    exp_Z = np.exp(Z_shifted)
+    probabilities = exp_Z / np.sum(exp_Z, axis = 1, keepdims = True)
+    return probabilities
+
 result = predict_game(X_entered, W, B)
 print("Predict:" ,result)
 
