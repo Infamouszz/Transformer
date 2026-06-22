@@ -4,6 +4,8 @@ import numpy as np
 import pickle
 import torch
 import torch_directml
+from tqdm import tqdm
+import h5py
 from triton.language import float32
 
 if torch.cuda.is_available():
@@ -16,78 +18,65 @@ else:
     device = torch.device("cpu")
     print("Using CPU")
 
-
-
-with resources.files('ModelsAi').joinpath('matrix_gen_5.pkl').open('rb') as m:
-    loaded_matrix = pickle.load(m)
-
-with resources.files('ModelsAi').joinpath('matrix_y_gen_5.pkl').open('rb') as my:
-    loaded_matrix_y = pickle.load(my)
-
-X_entered = loaded_matrix['X']
-Y_entered = loaded_matrix_y['Y']
-
-
-X = np.array(X_entered, dtype=np.float32)
-X = X / np.max(X)
-
-array_list = list(Y_entered.values())
-Y = np.vstack(array_list)
-Y = np.array(Y, dtype=np.float32)
-
-Y = torch.tensor(Y, dtype=torch.float32).to(device)
-X = torch.tensor(X, dtype=torch.float32).to(device)
-
-print("Class distribuition: ", torch.sum(Y, dim = 0).cpu())
-
 def train(hidden_layers, alpha, epochs, batch_size):
-    m = X.shape[1] * 2
-    A = {}
-    Z = {}
-    W, B, total_layers = W_B_initializer(hidden_layers)
-    dZ = {}
-    for epoch in range(epochs):
-        shuffle = torch.randperm(X.shape[0])
-        shuffled_Y = Y[shuffle,:]
-        shuffled_X = X[shuffle,:]
+    with h5py.File("meus_dados_prontos.h5",
+                   'r') as h5f:
+        X = h5f['X']
+        Y = h5f['Y']
 
-        for i in range(0, X.shape[0], batch_size):
-            batch_X = shuffled_X[i : i + batch_size, :]
-            batch_Y = shuffled_Y[i : i + batch_size, :]
-            batch_m = batch_X.shape[0]
+        total_samples = X.shape[0]
 
+        batchs_limit = [(i, min(i + batch_size, total_samples)) for i in range(0, total_samples, batch_size)]
 
-            previous_A = batch_X
-            for layer in range(total_layers):
-                is_out = is_Output_Layer(layer, total_layers)
+        X_shape = X.shape[1]
+        Y_shape = Y.shape[1]
+        A = {}
+        Z = {}
+        dZ = {}
+        W, B, total_layers = W_B_initializer(X_shape, Y_shape, hidden_layers)
+        for epoch in tqdm(range(epochs), desc="Training model..."):
+            np.random.shuffle(batchs_limit)
 
-                A_temp, Z_temp = layer_calculator(previous_A, W[layer], B[layer], is_out)
-                A[layer] = A_temp
-                Z[layer] = Z_temp
+            for start, end in batchs_limit:
+                batch_X = X[start:end, :]
+                batch_Y = Y[start:end, :]
 
-                previous_A = A_temp
+                tensor_X = torch.tensor(batch_X, dtype=torch.float32).to(device)
+                tensor_Y = torch.tensor(batch_Y, dtype=torch.float32).to(device)
 
-            for layer_upd in range(total_layers - 1, -1, -1):
-                if layer_upd == total_layers - 1:
-                    W_temp,B_temp,dZ_temp = update_out_layer_parameters(W[layer_upd], B[layer_upd], A[layer_upd - 1], A[layer_upd], batch_Y, batch_m, alpha)
-                    W[layer_upd] = W_temp
-                    B[layer_upd] = B_temp
-                    dZ[layer_upd] = dZ_temp
-                else:
-                    input_A = batch_X if layer_upd == 0 else A[layer_upd - 1]
-                    W_temp,B_temp,dZ_temp = update_hidden_layer_parameters(W[layer_upd],W[layer_upd+1], B[layer_upd], Z[layer_upd], dZ[layer_upd + 1], input_A, alpha)
-                    W[layer_upd] = W_temp
-                    B[layer_upd] = B_temp
-                    dZ[layer_upd] = dZ_temp
-        if epoch % 400 == 0:
-            accuracy = accuracy_calculator(previous_A, batch_Y)
-            print("Epoch: ", epoch, "Accuracy: ", accuracy)
+                batch_m = tensor_X.shape[0]
+
+                previous_A = tensor_X
+                for layer in range(total_layers):
+                    is_out = is_Output_Layer(layer, total_layers)
+
+                    A_temp, Z_temp = layer_calculator(previous_A, W[layer], B[layer], is_out)
+                    A[layer] = A_temp
+                    Z[layer] = Z_temp
+
+                    previous_A = A_temp
+
+                for layer_upd in range(total_layers - 1, -1, -1):
+                    if layer_upd == total_layers - 1:
+                        W_temp,B_temp,dZ_temp = update_out_layer_parameters(W[layer_upd], B[layer_upd], A[layer_upd - 1], A[layer_upd], tensor_Y, batch_m, alpha)
+                        W[layer_upd] = W_temp
+                        B[layer_upd] = B_temp
+                        dZ[layer_upd] = dZ_temp
+                    else:
+                        input_A = tensor_X if layer_upd == 0 else A[layer_upd - 1]
+                        W_temp,B_temp,dZ_temp = update_hidden_layer_parameters(W[layer_upd],W[layer_upd+1], B[layer_upd], Z[layer_upd], dZ[layer_upd + 1], input_A, alpha)
+                        W[layer_upd] = W_temp
+                        B[layer_upd] = B_temp
+                        dZ[layer_upd] = dZ_temp
+            if epoch % 400 == 0:
+                accuracy = accuracy_calculator(previous_A, tensor_Y)
+                print("Epoch: ", epoch, "Accuracy: ", accuracy)
     return W, B
 
-def W_B_initializer(hidden_layers):
+def W_B_initializer(X_shape, Y_shape, hidden_layers):
     W_initialized = {}
     B_initialized = {}
-    architecture = build_architecture(X,Y, hidden_layers)
+    architecture = build_architecture(X_shape,Y_shape, hidden_layers)
     layer = 1
     index = 0
     while layer <= len(architecture) - 1:
@@ -98,16 +87,16 @@ def W_B_initializer(hidden_layers):
     total_layers = len(architecture) - 1
     return W_initialized, B_initialized, total_layers
 
-def build_architecture(X, Y, hidden_layers):
+def build_architecture(X_shape, Y_shape, hidden_layers):
     architecture = {}
-    architecture[0] = X.shape[1]
+    architecture[0] = X_shape
 
     indexer = 1
 
     while indexer <= len(hidden_layers):
         architecture[indexer] = hidden_layers[indexer-1]
         indexer += 1
-    architecture[indexer] = Y.shape[1]
+    architecture[indexer] = Y_shape
     return architecture
 
 def update_out_layer_parameters(W, B, A_lower, A, Y , m, alpha):
@@ -201,14 +190,14 @@ def predict(X, W, B):
 
     return A_new
 
-W_new, B_new = train([128, 64, 32, 16], 0.001, 15000, 1024)
+W_new, B_new = train([128, 64, 32, 16], 0.001, 2000, 1024)
 
 parameters = {
     'W': W_new,
     'B': B_new,
 }
 
-path = resources.files('ModelsAi').joinpath('parameters_gen_7.pkl')
+path = resources.files('ModelsAi').joinpath('parameters_gen_10.pkl')
 with path.open('wb') as p:
     pickle.dump(parameters, p)
     print("Parameters saved successfully")
