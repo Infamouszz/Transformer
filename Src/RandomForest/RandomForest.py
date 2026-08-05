@@ -50,7 +50,7 @@ class Bootstrap:
 
 forest = RandomForest(X_treino, Y_treino)
 forest.build_random_forest()
-new_value = np.array([[20, 130, 0]])
+new_value = np.array([[20, 80, 0]])
 random_forest_result = forest.predict_random_forest(new_value)
 print("Resultado random forest: ", random_forest_result)
 

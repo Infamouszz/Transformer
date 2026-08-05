@@ -24,7 +24,7 @@ def tuning(alpha_range, lasso_range, X, Y):
         candidate_alpha *= 10
     return winner_model, worst_loss
 
-X,Y = MseRegression.z_score_X, MseRegression.Y_linear
+X,Y = MseRegression.z_score_X, MseRegression.Y_quadratic
 best_model, worst_loss = tuning(0.1, 100, X, Y)
 print("Melhor modelo: ", best_model)
 print("Pior modelo: ", worst_loss)
