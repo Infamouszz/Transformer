@@ -15,7 +15,16 @@ class BPETokenizer:
         for (p0, p1), new_id in self.merges.items():
             self.vocab[new_id] = self.vocab[p0] + self.vocab[p1]
 
-    def encode(self, text):
+        next_id = 256 + len(merges_list)
+        self.special_tokens = {
+            "<PAD>": next_id,
+            "<BOS>": next_id + 1,
+            "<EOS>": next_id + 2,
+            "<UNK>": next_id + 3,
+        }
+        self.inverse_special_tokens = {v: k for k, v in self.special_tokens.items()}
+
+    def encode(self, text, add_special_tokens=True):
         chunks = self.compiled_pattern.findall(text)
         tokens = []
 
@@ -47,8 +56,14 @@ class BPETokenizer:
                 chunk_bytes = new_list
 
             tokens.extend(chunk_bytes)
+
+        if add_special_tokens:
+            tokens = [self.special_tokens["<BOS>"]] + tokens + [self.special_tokens["<EOS>"]]
+
         return tokens
 
     def decode(self, tokens):
-        raw_bytes = b"".join(self.vocab[idx] for idx in tokens)
+        raw_bytes = b"".join(
+            self.vocab[idx] for idx in tokens if idx in self.vocab
+        )
         return raw_bytes.decode("utf-8", errors="replace")
