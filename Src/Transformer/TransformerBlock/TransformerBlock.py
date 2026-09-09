@@ -26,12 +26,14 @@ class TransformerBlock:
 
 
     def forward(self, input_X):
+        batch_size, seq_len, _ = input_X.shape
+
         X_norm1 = self.norm1.forward(input_X)
         Q, K, V = self.mha.forward(X_norm1, self.Wq, self.Wk, self.Wv)
 
         Q_split, K_split, V_split = self.mhd.rearrange(Q, K, V, num_heads=32)
 
-        causal_mask_sliced = self.mask[:, :, :self.seq_len, :self.seq_len]
+        causal_mask_sliced = self.mask[:, :, :seq_len, :seq_len]
 
         attention_out, attn_weights = self.sa.forward(Q_split, K_split, V_split, causal_mask_sliced)
         mha_out = self.mhd.concatenateWo(attention_out, self.Wo)
