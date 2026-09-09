@@ -15,7 +15,7 @@ class AdamOptimizer:
     def zero_grad(self, param_grads):
         for p, g in param_grads:
             if g is not None:
-                g = torch.zeros_like(g)
+                g.zero_()
 
 
     def update(self, params_grads):

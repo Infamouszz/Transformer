@@ -35,7 +35,7 @@ class MultiHeadDivisor:
     def __init__(self, d_model):
         self.d_model = d_model
 
-    def rearrange(self, current_batch_size, Q, K, V, num_heads=32):
+    def rearrange(self, Q, K, V, num_heads=32):
         batch_size, seq_len, d_model = Q.shape
         d_k = d_model // num_heads
 
@@ -45,7 +45,7 @@ class MultiHeadDivisor:
 
         return Q_split, K_split, V_split
 
-    def concatenateWo(self, current_batch_size, attention_out, Wo):
+    def concatenateWo(self, attention_out, Wo):
         batch_size, num_heads, seq_len, d_k = attention_out.shape
 
         attention_concatenated = attention_out.transpose(1, 2).reshape(batch_size, seq_len, self.d_model)
