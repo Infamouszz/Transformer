@@ -20,7 +20,7 @@ class TransformerBlock:
         self.sa = SelfAttention(d_model)
         self.ffn = NeuralNetwork.NeuralNetwork(d_model, d_model * 4)
 
-        self.Wq, self.Wk, self.Wv, self.Wo = AttentionWeightsInitializer.WeightInitializer(self.d_model).init_weights_HE()
+        self.Wq, self.Wk, self.Wv, self.Wo = AttentionWeightsInitializer.WeightInitializer(d_model).init_weights_HE()
 
         self.cache = {}
 
@@ -79,9 +79,7 @@ class TransformerBlock:
         dK = dK_split.transpose(1, 2).reshape(dZ.shape)
         dV = dV_split.transpose(1, 2).reshape(dZ.shape)
 
-        dX_norm1, self.dWq, self.dWk, self.dWv = self.mha.backward(
-            dQ, dK, dV, self.cache['X_norm1'], self.Wq, self.Wk, self.Wv
-        )
+        dX_norm1, self.dWq, self.dWk, self.dWv = self.mha.backward(dQ, dK, dV, self.cache['X_norm1'], self.Wq, self.Wk, self.Wv)
 
         dinput_X_mha, self.dgamma_norm1, self.dbeta_norm1 = self.norm1.backward(dX_norm1)
 

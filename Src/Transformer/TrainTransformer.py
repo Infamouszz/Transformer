@@ -5,10 +5,10 @@ from Src.Transformer.Settings.Config import DEVICE
 from Src.Transformer.Transformer import Transformer
 from tqdm import tqdm
 
-transformer = Transformer(epochs=10, batch_size=16, d_model=512, vocab_size=10259, causal_mask_size=2048, max_seq_len=256)
+transformer = Transformer(epochs=10, batch_size=16, d_model=512, vocab_size=10259, causal_mask_size=2048, max_seq_len=256, num_blocks=6)
 transformer.to(DEVICE)
-optimizer = AdamOptimizer(parameters=transformer.get_params(), alpha=3e-4)
-dataloader = DataLoaderPackerLocal(base_path=f"E:/DatasetAi/", max_parts=800, seq_len=256, batch_size=16)
+optimizer = AdamOptimizer(parameters=transformer.get_params(), alpha=1e-3)
+dataloader = DataLoaderPackerLocal(base_path=f"E:/DatasetAi/", max_parts=1, seq_len=256, batch_size=16)
 
 steps = 0
 with torch.no_grad():

@@ -34,7 +34,7 @@ class SelfAttention:
 
         dQ = torch.matmul(dS, K)
 
-        dS_T = dS.transpose(-2, -1).contiguous()
-        dK = torch.matmul(dS_T, Q)
+        Q_T = Q.transpose(-2, -1).contiguous()
+        dK = torch.matmul(Q_T, dS)
 
         return dQ, dK, dV
