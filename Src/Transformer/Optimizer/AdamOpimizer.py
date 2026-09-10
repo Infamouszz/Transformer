@@ -23,6 +23,7 @@ class AdamOptimizer:
 
     def update(self, params_grads):
         self.steps += 1
+        current_alpha = self.cosine_alpha_decay(self.steps, self.total_steps)
 
         for p, g in params_grads:
             if g is None:
@@ -36,9 +37,7 @@ class AdamOptimizer:
             m_hat = self.m[parameter_id] / (1 - self.beta1 ** self.steps)
             v_hat = self.v[parameter_id] / (1 - self.beta2 ** self.steps)
 
-            cosine_alpha = self.cosine_alpha_decay(self.steps, self.total_steps)
-
-            p -= cosine_alpha * m_hat / (torch.sqrt(v_hat) + self.eps)
+            p -= current_alpha * m_hat / (torch.sqrt(v_hat) + self.eps)
 
     def clip_grad_norm_(self, params_grads, max_norm=1.0):
         total_sq_norm = 0.0
@@ -57,7 +56,11 @@ class AdamOptimizer:
 
         return total_norm
 
-    def cosine_alpha_decay(self, step, total_steps):
+    def cosine_decay_warmup(self, step, total_steps):
+        warmup_steps = total_steps * 0.1
+        if step < warmup_steps:
+            return self.alpha * (step / max(1, warmup_steps))
+
         max_alpha = self.alpha
         min_alpha = self.alpha * 0.2
         current_step = min(step, total_steps)
