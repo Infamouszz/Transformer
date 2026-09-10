@@ -23,7 +23,7 @@ class AdamOptimizer:
 
     def update(self, params_grads):
         self.steps += 1
-        current_alpha = self.cosine_alpha_decay(self.steps, self.total_steps)
+        current_alpha = self.cosine_decay_warmup(self.steps, self.total_steps)
 
         for p, g in params_grads:
             if g is None:
