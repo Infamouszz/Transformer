@@ -4,7 +4,7 @@ from Src.Transformer.MultiHeadAttention.MultiHead import MultiHeadDivisor
 from Src.Transformer.Mask.CausalMask import CausalMask
 from Src.Transformer.MultiHeadAttention.SelfAttention import SelfAttention
 from Src.Transformer.ResidualConnection import ResidualConnectionCalculator
-from Src.Transformer.ForwardNeuralNetwork.Src.NeuralNetwork import NeuralNetwork
+from Src.Transformer.NeuralNetwork import NeuralNetwork
 from Src.Transformer.Normalization import LayerNormalization
 
 class TransformerBlock:
