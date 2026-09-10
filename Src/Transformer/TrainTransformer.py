@@ -9,11 +9,11 @@ transformer = Transformer(epochs=2, batch_size=16, d_model=512, vocab_size=10259
 transformer.to(DEVICE)
 dataloader = DataLoaderPackerLocal(base_path=f"/kaggle/working/DatasetAi", max_parts=10, seq_len=256, batch_size=16)
 total_steps = dataloader.get_max_steps() * transformer.epochs
-optimizer = AdamOptimizer(parameters=transformer.get_params(), alpha=1e-3, total_steps=total_steps)
+optimizer = AdamOptimizer(parameters=transformer.get_params(), alpha=3e-4, total_steps=total_steps)
 
 steps = 0
 print("Training started")
-for e in range(1, transformer.epochs):
+for e in range(transformer.epochs):
     with torch.no_grad():
         for X, Y in dataloader.load():
             X = X.to(DEVICE)
