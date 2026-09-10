@@ -1,3 +1,7 @@
+import os
+
+os.environ["CUDA_LAUNCH_BLOCKING"] = "1"
+import torch
 import torch
 from Src.Transformer.DatasetPreLoader import DataLoaderPackerLocal
 from Src.Transformer.Optimizer.AdamOpimizer import AdamOptimizer
