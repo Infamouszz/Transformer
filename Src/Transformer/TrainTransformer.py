@@ -33,7 +33,7 @@ with torch.no_grad():
 
         transformer.backward(dZ)
 
-        optimizer.clip_grad_norm_(transformer.get_params(), 1.0)
+        optimizer.clip_grad_norm_(transformer.get_params_grads(), 1.0)
 
         optimizer.update(transformer.get_params_grads())
 
