@@ -13,7 +13,7 @@ optimizer = AdamOptimizer(parameters=transformer.get_params(), alpha=1e-3, total
 
 steps = 0
 print("Training started")
-for e in range(transformer.epochs):
+for e in range(1, transformer.epochs):
     with torch.no_grad():
         for X, Y in dataloader.load():
             X = X.to(DEVICE)
