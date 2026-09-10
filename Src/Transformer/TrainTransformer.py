@@ -40,8 +40,7 @@ with torch.no_grad():
         steps += 1
 
         if steps % 100 == 0:
-            print(f"Loss: {loss.item():}")
-            print(f"Steps: {steps}")
+            print(f"Loss: {loss.item():} | Steps: {steps}")
 
 print("Training finished")
 transformer.save_params(r"/kaggle/working/parameters.pt")
