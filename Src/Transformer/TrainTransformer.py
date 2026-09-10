@@ -23,9 +23,6 @@ with torch.no_grad():
         logits_flat = logits.view(-1, logits.size(-1))
         loss = torch.nn.functional.cross_entropy(logits_flat, Y_flat)
 
-        predicts = torch.argmax(logits_flat, dim=-1)
-        total_tokens = Y_flat.size(0)
-
         probs = torch.softmax(logits_flat, dim=-1)
         dZ_flat = probs.clone()
 
