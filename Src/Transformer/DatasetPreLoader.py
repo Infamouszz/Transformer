@@ -42,5 +42,5 @@ class DataLoaderPackerLocal:
         total_steps = 0
         for data in self.data_cache:
             total_chunks = len(data) // chunk_size
-            total_steps += total_chunks
+            total_steps += total_chunks // self.batch_size
         return total_steps

@@ -39,7 +39,7 @@ def generate_text(transformer, tokens_tensor, max_tokens_generated, eos_id, temp
 
     return current_tokens
 
-text = "Que isso "
+text = "O maior país do mundo é "
 tokens = tokenizer_instance.encode(text)
 seq_len = len(tokens)
 tensor_tokens = torch.tensor([tokens]).to(DEVICE)

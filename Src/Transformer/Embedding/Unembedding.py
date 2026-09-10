@@ -14,8 +14,6 @@ class Unembedding:
         return W_unembed, b_unembed
 
     def forward(self, final_X, W_unembed, b_unembed):
-
-
         logits = torch.matmul(final_X, W_unembed) + b_unembed
         return logits
 
