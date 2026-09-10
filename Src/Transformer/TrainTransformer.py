@@ -7,12 +7,12 @@ from tqdm import tqdm
 
 transformer = Transformer(epochs=10, batch_size=16, d_model=512, vocab_size=10259, causal_mask_size=2048, max_seq_len=256, num_blocks=6)
 transformer.to(DEVICE)
-optimizer = AdamOptimizer(parameters=transformer.get_params(), alpha=1e-3)
+optimizer = AdamOptimizer(parameters=transformer.get_params(), alpha=2e-4)
 dataloader = DataLoaderPackerLocal(base_path=f"/kaggle/working/DatasetAi", max_parts=95, seq_len=256, batch_size=16)
 
 steps = 0
 with torch.no_grad():
-    for X, Y in tqdm(dataloader.load(), desc="Training..."):
+    for X, Y in dataloader.load():
         X = X.to(DEVICE)
         Y = Y.to(DEVICE)
 
@@ -38,8 +38,9 @@ with torch.no_grad():
 
         steps += 1
 
-        if steps % 100 == 0:
+        if steps % 1000 == 0:
             print(f"Loss: {loss.item():}")
+            print(f"Steps: {steps}")
 
 print("Training finished")
 transformer.save_params(r"/kaggle/working/parameters.pt")

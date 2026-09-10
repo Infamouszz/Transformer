@@ -1,7 +1,7 @@
 import torch
 
 class AdamOptimizer:
-    def __init__(self, parameters, alpha=0.001, beta1=0.9, beta2=0.999, eps=1e-8):
+    def __init__(self, parameters, alpha=3e-4, beta1=0.9, beta2=0.999, eps=1e-8):
         self.parameters = parameters
         self.alpha = alpha
         self.beta1 = beta1
