@@ -1,3 +1,5 @@
+import math
+
 import torch
 
 class AdamOptimizer:
@@ -58,7 +60,8 @@ class AdamOptimizer:
     def cosine_alpha_decay(self, step, total_steps):
         max_alpha = self.alpha
         min_alpha = self.alpha * 0.2
+        current_step = min(step, total_steps)
 
-        target_learning_rate = (min_alpha + (max_alpha - min_alpha)/2) * (1 + torch.cos((step/total_steps)*torch.pi))
+        target_learning_rate = min_alpha + 0.5 * (max_alpha - min_alpha) * (1 + math.cos((current_step/total_steps)*math.pi))
 
         return target_learning_rate
