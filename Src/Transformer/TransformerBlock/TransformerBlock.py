@@ -31,7 +31,7 @@ class TransformerBlock:
         X_norm1 = self.norm1.forward(input_X)
         Q, K, V = self.mha.forward(X_norm1, self.Wq, self.Wk, self.Wv)
 
-        Q_split, K_split, V_split = self.mhd.rearrange(Q, K, V, num_heads=32)
+        Q_split, K_split, V_split = self.mhd.rearrange(Q, K, V, num_heads=8)
 
         causal_mask_sliced = self.mask[:, :, :seq_len, :seq_len]
 

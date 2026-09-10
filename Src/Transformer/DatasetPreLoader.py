@@ -36,3 +36,11 @@ class DataLoaderPackerLocal:
 
                 if len(batch_X) == self.batch_size:
                     yield batch_X, batch_Y
+
+    def get_max_steps(self):
+        chunk_size = self.seq_len + 1
+        total_steps = 0
+        for data in self.data_cache:
+            total_chunks = len(data) // chunk_size
+            total_steps += total_chunks
+        return total_steps
