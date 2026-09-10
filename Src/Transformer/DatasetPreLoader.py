@@ -5,6 +5,15 @@ class DataLoaderPackerLocal:
         self.file_paths = [f"{base_path}/dataset_parte_{i}.pt" for i in range(max_parts)]
         self.seq_len = seq_len
         self.batch_size = batch_size
+        self.data_cache = []
+
+        for i in range(max_parts):
+            fp = f"{base_path}/dataset_parte_{i}.pt"
+            try:
+                data = torch.load(fp, map_location="cpu", weights_only=True)
+                self.data_cache.append(data)
+            except FileNotFoundError:
+                print(f"Arquivo {fp} não encontrado, pulando...")
 
         for i in range(max_parts):
             fp = f"{base_path}/dataset_parte_{i}.pt"
