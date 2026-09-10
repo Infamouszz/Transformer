@@ -11,6 +11,7 @@ optimizer = AdamOptimizer(parameters=transformer.get_params(), alpha=3e-4)
 dataloader = DataLoaderPackerLocal(base_path=f"/kaggle/working/DatasetAi", max_parts=30, seq_len=256, batch_size=16)
 
 steps = 0
+print("Training started")
 with torch.no_grad():
     for X, Y in dataloader.load():
         X = X.to(DEVICE)
@@ -38,7 +39,7 @@ with torch.no_grad():
 
         steps += 1
 
-        if steps % 1000 == 0:
+        if steps % 100 == 0:
             print(f"Loss: {loss.item():}")
             print(f"Steps: {steps}")
 
