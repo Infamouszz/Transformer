@@ -9,7 +9,7 @@ transformer = Transformer(epochs=10, batch_size=16, d_model=512, vocab_size=1025
 transformer.to(DEVICE)
 dataloader = DataLoaderPackerLocal(base_path=f"/kaggle/working/DatasetAi", max_parts=10, seq_len=256, batch_size=16)
 total_steps = dataloader.get_max_steps()
-optimizer = AdamOptimizer(parameters=transformer.get_params(), alpha=3e-4, total_steps=total_steps)
+optimizer = AdamOptimizer(parameters=transformer.get_params(), alpha=1e-3, total_steps=total_steps)
 
 steps = 0
 print("Training started")
