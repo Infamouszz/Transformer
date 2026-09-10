@@ -16,8 +16,7 @@ with torch.no_grad():
         X = X.to(DEVICE)
         Y = Y.to(DEVICE)
 
-        print(type(Y), Y)
-        Y_flat = Y.view(-1)
+        Y_flat = Y.reshape(-1)
 
 
         logits = transformer.forward(X)
