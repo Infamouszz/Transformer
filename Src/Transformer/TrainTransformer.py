@@ -15,7 +15,10 @@ with torch.no_grad():
     for X, Y in tqdm(dataloader.load(), desc="Training..."):
         X = X.to(DEVICE)
         Y = Y.to(DEVICE)
+
+        print(type(Y), Y)
         Y_flat = Y.view(-1)
+
 
         logits = transformer.forward(X)
         logits_flat = logits.view(-1, logits.size(-1))
