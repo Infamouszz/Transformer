@@ -15,13 +15,6 @@ class DataLoaderPackerLocal:
             except FileNotFoundError:
                 print(f"Arquivo {fp} não encontrado, pulando...")
 
-        for i in range(max_parts):
-            fp = f"{base_path}/dataset_parte_{i}.pt"
-            try:
-                data = torch.load(fp, map_location="cpu", weights_only=True)
-                self.data_cache.append(data)
-            except FileNotFoundError:
-                print(f"Arquivo {fp} não encontrado, pulando...")
 
     def load(self):
         chunk_size = self.seq_len + 1
