@@ -43,7 +43,7 @@ for e in range(transformer.epochs):
             steps += 1
 
             if steps % 100 == 0:
-                print(f"Loss: {loss.item():} | Steps: {steps} | Total steps: {total_steps} | Epochs: {e} | Learning Rate: {optimizer.alpha}")
+                print(f"Loss: {loss.item():} | Steps: {steps} | Total steps: {total_steps} | Epochs: {e} | Learning Rate: {optimizer.cosine_decay_warmup(steps, total_steps)}")
 
 print("Training finished")
 transformer.save_params(r"/kaggle/working/parameters.pt")

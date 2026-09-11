@@ -62,7 +62,7 @@ class AdamOptimizer:
             return self.alpha * (step / max(1, warmup_steps))
 
         max_alpha = self.alpha
-        min_alpha = self.alpha * 0.2
+        min_alpha = self.alpha * 0.1
         current_step = min(step, total_steps)
 
         target_learning_rate = min_alpha + 0.5 * (max_alpha - min_alpha) * (1 + math.cos((current_step/total_steps)*math.pi))
