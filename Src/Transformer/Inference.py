@@ -39,7 +39,7 @@ def generate_text(transformer, tokens_tensor, max_tokens_generated, eos_id, temp
 
     return current_tokens
 
-text = ". "
+text = "Morre "
 tokens = tokenizer_instance.encode(text)
 seq_len = len(tokens)
 tensor_tokens = torch.tensor([tokens]).to(DEVICE)

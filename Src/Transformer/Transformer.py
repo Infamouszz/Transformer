@@ -63,9 +63,12 @@ class Transformer:
         for block in reversed(self.blocks):
             dX_block = block.backward(dX_block)
 
+        dX_embedded = dX_block / torch.sqrt(self.d_model)
+
         self.dW_embed = torch.zeros_like(self.embedding)
+
         tokens_flat = self.cache['X_tokens'].reshape(-1).to(device=DEVICE)
-        grad_flat = dX_block.reshape(-1, self.d_model)
+        grad_flat = dX_embedded.reshape(-1, self.d_model)
 
         self.dW_embed.index_add_(0, tokens_flat, grad_flat)
 

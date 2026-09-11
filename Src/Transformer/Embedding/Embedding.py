@@ -34,6 +34,8 @@ class Embedding:
         else:
             tokens_tensor = torch.tensor(tokens, dtype=torch.long, device=DEVICE)
         tokens_embedding = embedding[tokens_tensor]
+
+        tokens_embedding = tokens_embedding * math.sqrt(self.d_model)
     
         return tokens_embedding + positional_embedding
 
