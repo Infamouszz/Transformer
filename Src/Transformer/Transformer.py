@@ -1,3 +1,5 @@
+import math
+
 import torch
 from Src.Transformer.Embedding import Embedding
 from Src.Transformer.Embedding.Unembedding import Unembedding
@@ -63,7 +65,7 @@ class Transformer:
         for block in reversed(self.blocks):
             dX_block = block.backward(dX_block)
 
-        dX_embedded = dX_block / torch.sqrt(self.d_model)
+        dX_embedded = dX_block / math.sqrt(self.d_model)
 
         self.dW_embed = torch.zeros_like(self.embedding)
 
