@@ -5,7 +5,7 @@ from Src.Transformer.Settings.Config import DEVICE
 from Src.Transformer.Transformer import Transformer
 from tqdm import tqdm
 
-transformer = Transformer(epochs=1, batch_size=16, d_model=512, vocab_size=10259, causal_mask_size=2048, max_seq_len=256, num_blocks=6)
+transformer = Transformer(epochs=1, batch_size=16, d_model=768, vocab_size=10259, causal_mask_size=2048, max_seq_len=256, num_blocks=24)
 transformer.to(DEVICE)
 dataloader = DataLoaderPackerLocal(base_path=f"/kaggle/working/DatasetAi", max_parts=20, seq_len=256, batch_size=16)
 total_steps = dataloader.get_max_steps() * transformer.epochs
