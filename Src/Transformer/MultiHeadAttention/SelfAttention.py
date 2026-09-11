@@ -30,11 +30,12 @@ class SelfAttention:
 
         sum_dA_A = torch.sum(dA * attn_weights, dim=-1, keepdim=True)
         dS = attn_weights * (dA - sum_dA_A)
+
         dS = dS / (d_k ** 0.5)
 
         dQ = torch.matmul(dS, K)
 
-        Q_T = Q.transpose(-2, -1).contiguous()
-        dK = torch.matmul(Q_T, dS)
+        dS_T = dS.transpose(-2, -1).contiguous()
+        dK = torch.matmul(dS_T, Q)
 
         return dQ, dK, dV
