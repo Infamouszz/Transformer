@@ -21,6 +21,9 @@ class BPETokenizer:
             "<BOS>": next_id + 1,
             "<EOS>": next_id + 2,
             "<UNK>": next_id + 3,
+            "<SYSTEM>": next_id + 4,
+            "<USER>": next_id + 5,
+            "<ASSISTANT>": next_id + 6
         }
         self.inverse_special_tokens = {v: k for k, v in self.special_tokens.items()}
 
