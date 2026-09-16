@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 transformer = Transformer(epochs=1, batch_size=16, d_model=512, vocab_size=10262, causal_mask_size=2048, max_seq_len=512, num_blocks=6)
 transformer.to(DEVICE)
-dataloader = DataLoaderPackerLocal(base_path=f"/kaggle/working/datasetai-sft/DatasetAiSFT", max_parts=70, seq_len=512, batch_size=16)
+dataloader = DataLoaderPackerLocal(base_path=f"/kaggle/working/DatasetAiSFT", max_parts=70, seq_len=512, batch_size=16)
 total_steps = dataloader.get_max_steps() * transformer.epochs
 optimizer = AdamOptimizer(parameters=transformer.get_params(), alpha=3e-4, total_steps=total_steps)
 
