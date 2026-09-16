@@ -29,9 +29,6 @@ class Embedding:
         return pe
     
     def forward(self,  tokens, embedding, positional_embedding):
-        print(f"Max token ID: {tokens.max().item()} | Min token ID: {tokens.min().item()}")
-        print(f"Seq length (X): {tokens.shape[1]} | Pos emb size: {positional_embedding.shape}")
-
         if isinstance(tokens, torch.Tensor):
             tokens_tensor = tokens.clone().detach().to(dtype=torch.long, device=DEVICE)
         else:
