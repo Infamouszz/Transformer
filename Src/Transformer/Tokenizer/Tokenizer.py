@@ -28,40 +28,57 @@ class BPETokenizer:
         self.inverse_special_tokens = {v: k for k, v in self.special_tokens.items()}
 
     def encode(self, text, add_special_tokens=True):
-        chunks = self.compiled_pattern.findall(text)
+        import re
+
+        special_pattern = "(" + "|".join(re.escape(k) for k in self.special_tokens.keys()) + ")"
+
+        parts = re.split(special_pattern, text)
+
         tokens = []
 
-        for chunk in chunks:
-            chunk_bytes = list(chunk.encode("utf-8"))
+        if add_special_tokens:
+            tokens.append(self.special_tokens["<BOS>"])
 
-            while len(chunk_bytes) >= 2:
-                stats = {}
-                for i in range(len(chunk_bytes) - 1):
-                    pair = (chunk_bytes[i], chunk_bytes[i + 1])
-                    if pair in self.merges:
-                        stats[pair] = self.merges[pair]
+        for part in parts:
+            if not part:
+                continue
 
-                if not stats:
-                    break
+            if part in self.special_tokens:
+                tokens.append(self.special_tokens[part])
+            else:
+                chunks = self.compiled_pattern.findall(part)
 
-                best_pair = min(stats, key=stats.get)
-                new_id = self.merges[best_pair]
+                for chunk in chunks:
+                    chunk_bytes = list(chunk.encode("utf-8"))
 
-                new_list = []
-                i = 0
-                while i < len(chunk_bytes):
-                    if i < len(chunk_bytes) - 1 and (chunk_bytes[i], chunk_bytes[i + 1]) == best_pair:
-                        new_list.append(new_id)
-                        i += 2
-                    else:
-                        new_list.append(chunk_bytes[i])
-                        i += 1
-                chunk_bytes = new_list
+                    while len(chunk_bytes) >= 2:
+                        stats = {}
+                        for i in range(len(chunk_bytes) - 1):
+                            pair = (chunk_bytes[i], chunk_bytes[i + 1])
+                            if pair in self.merges:
+                                stats[pair] = self.merges[pair]
 
-            tokens.extend(chunk_bytes)
+                        if not stats:
+                            break
+
+                        best_pair = min(stats, key=stats.get)
+                        new_id = self.merges[best_pair]
+
+                        new_list = []
+                        i = 0
+                        while i < len(chunk_bytes):
+                            if i < len(chunk_bytes) - 1 and (chunk_bytes[i], chunk_bytes[i + 1]) == best_pair:
+                                new_list.append(new_id)
+                                i += 2
+                            else:
+                                new_list.append(chunk_bytes[i])
+                                i += 1
+                        chunk_bytes = new_list
+
+                    tokens.extend(chunk_bytes)
 
         if add_special_tokens:
-            tokens = [self.special_tokens["<BOS>"]] + tokens + [self.special_tokens["<EOS>"]]
+            tokens.append(self.special_tokens["<EOS>"])
 
         return tokens
 

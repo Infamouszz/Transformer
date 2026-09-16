@@ -8,10 +8,10 @@ path = r"C:\Users\Guilherme\PycharmProjects\DashboardAi\Src\Transformer\Tokenize
 pattern = r"(?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}{1,3}|[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+(?!\S)|\s+"
 
 tokenizer_instance = Tokenizer.BPETokenizer(merges_file=path, pattern=pattern)
-transformer_instance = Transformer(epochs=1, batch_size=1, d_model=512, vocab_size=10262, causal_mask_size=2048, max_seq_len=256, num_blocks=6)
-transformer_instance.load_params(r"E:/ModelAi/parameters_stf.pt")
+transformer_instance = Transformer(epochs=1, batch_size=1, d_model=512, vocab_size=10262, causal_mask_size=2048, max_seq_len=512, num_blocks=6)
+transformer_instance.load_params(r"E:/ModelAi/parameters.pt")
 
-def generate_text(transformer, tokens_tensor, max_tokens_generated, eos_id, temperature=0.1, repetition_penalty=1.2):
+def generate_text(transformer, tokens_tensor, max_tokens_generated, eos_id, temperature=0.3, repetition_penalty=1.2):
     with torch.no_grad():
         current_tokens = tokens_tensor.clone()
 
@@ -39,7 +39,7 @@ def generate_text(transformer, tokens_tensor, max_tokens_generated, eos_id, temp
 
     return current_tokens
 
-texto_input = "[{'role': 'system', 'content': 'Você é um assistente útil.'}, {'role': 'user', 'content': 'Qual a capital do Brasil?'}, {'role': 'assistant', 'content': '"
+texto_input = "Alugar "
 tokens = tokenizer_instance.encode(texto_input)
 seq_len = len(tokens)
 tensor_tokens = torch.tensor([tokens]).to(DEVICE)
