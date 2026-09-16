@@ -12,7 +12,7 @@ total_steps = dataloader.get_max_steps() * transformer.epochs
 optimizer = AdamOptimizer(parameters=transformer.get_params(), alpha=3e-4, total_steps=total_steps)
 
 steps = 0
-transformer.load_params(r"/kaggle/working/parameters_fix.pt")
+transformer.load_params(r"/kaggle/working/parameters_fixed_final.pt")
 print("Parameters loaded")
 print("Training started")
 for e in range(transformer.epochs):
