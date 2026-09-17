@@ -27,7 +27,7 @@ class BPETokenizer:
         }
         self.inverse_special_tokens = {v: k for k, v in self.special_tokens.items()}
 
-    def encode(self, text, add_special_tokens=True):
+    def encode(self, text, add_start_tokens=True, add_final_tokens=False):
         import re
 
         special_pattern = "(" + "|".join(re.escape(k) for k in self.special_tokens.keys()) + ")"
@@ -36,7 +36,7 @@ class BPETokenizer:
 
         tokens = []
 
-        if add_special_tokens:
+        if add_start_tokens:
             tokens.append(self.special_tokens["<BOS>"])
 
         for part in parts:
@@ -77,7 +77,7 @@ class BPETokenizer:
 
                     tokens.extend(chunk_bytes)
 
-        if add_special_tokens:
+        if add_final_tokens:
             tokens.append(self.special_tokens["<EOS>"])
 
         return tokens

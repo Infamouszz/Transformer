@@ -8,8 +8,8 @@ path = r"C:\Users\Guilherme\PycharmProjects\DashboardAi\Src\Transformer\Tokenize
 pattern = r"(?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}{1,3}|[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+(?!\S)|\s+"
 
 tokenizer_instance = Tokenizer.BPETokenizer(merges_file=path, pattern=pattern)
-transformer_instance = Transformer(epochs=1, batch_size=1, d_model=512, vocab_size=10262, causal_mask_size=2048, max_seq_len=512, num_blocks=6)
-transformer_instance.load_params(r"E:/ModelAi/parameters.pt")
+transformer_instance = Transformer(epochs=1, batch_size=1, d_model=512, vocab_size=10263, causal_mask_size=2048, max_seq_len=512, num_blocks=6)
+transformer_instance.load_params(r"E:/ModelAi/parameters_sft.pt")
 
 def generate_text(transformer, tokens_tensor, max_tokens_generated, eos_id, temperature=0.3, repetition_penalty=1.2):
     with torch.no_grad():
@@ -39,7 +39,7 @@ def generate_text(transformer, tokens_tensor, max_tokens_generated, eos_id, temp
 
     return current_tokens
 
-texto_input = "Alugar "
+texto_input = "<SYSTEM>Você é um assistente enciclopédico com um tom amigável.<USER>Qual o maior país do mundo?<ASSISTANT>O maior país do mundo é"
 tokens = tokenizer_instance.encode(texto_input)
 seq_len = len(tokens)
 tensor_tokens = torch.tensor([tokens]).to(DEVICE)
