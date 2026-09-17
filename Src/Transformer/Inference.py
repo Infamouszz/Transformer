@@ -39,8 +39,8 @@ def generate_text(transformer, tokens_tensor, max_tokens_generated, eos_id, temp
 
     return current_tokens
 
-texto_input = "<SYSTEM>Você é um assistente enciclopédico com um tom amigável.<USER>Qual o maior país do mundo?<ASSISTANT>O maior país do mundo é"
-tokens = tokenizer_instance.encode(texto_input)
+texto_input = "<SYSTEM>Seja amavel e amigavel com o usuário<USER>Sou seu criado, eu te amo<ASSISTANT>"
+tokens = tokenizer_instance.encode(texto_input, add_final_tokens=False)
 seq_len = len(tokens)
 tensor_tokens = torch.tensor([tokens]).to(DEVICE)
 
