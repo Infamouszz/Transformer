@@ -4,7 +4,7 @@ from Src.Transformer.Optimizer.AdamOpimizer import AdamOptimizer
 from Src.Transformer.Settings.Config import DEVICE
 from Src.Transformer.Transformer import Transformer
 
-transformer = Transformer(epochs=1, batch_size=16, d_model=512, vocab_size=10263, causal_mask_size=2048, max_seq_len=512, num_blocks=6)
+transformer = Transformer(epochs=2, batch_size=16, d_model=512, vocab_size=10263, causal_mask_size=2048, max_seq_len=512, num_blocks=6)
 transformer.to(DEVICE)
 dataloader = DataLoaderPackerLocal(base_path=f"/kaggle/working/DatasetAiSFT_FINAL", max_parts=15, seq_len=512, batch_size=16)
 total_steps = dataloader.get_max_steps() * transformer.epochs
@@ -44,8 +44,7 @@ for e in range(transformer.epochs):
 
             steps += 1
 
-            if steps % 100 == 0:
-                print(f"Loss: {loss.item():} | Steps: {steps} | Total steps: {total_steps} | Epochs: {e} | Learning Rate: {optimizer.cosine_decay_warmup(steps, total_steps)}")
+            print(f"Loss: {loss.item():} | Steps: {steps} | Total steps: {total_steps} | Epochs: {e} | Learning Rate: {optimizer.cosine_decay_warmup(steps, total_steps)}")
 
 print("Training finished")
 transformer.save_params(r"/kaggle/working/parameters_sft_final.pt")

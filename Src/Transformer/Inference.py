@@ -9,9 +9,9 @@ pattern = r"(?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}{1,3}|[^\
 
 tokenizer_instance = Tokenizer.BPETokenizer(merges_file=path, pattern=pattern)
 transformer_instance = Transformer(epochs=1, batch_size=1, d_model=512, vocab_size=10263, causal_mask_size=2048, max_seq_len=512, num_blocks=6)
-transformer_instance.load_params(r"E:/ModelAi/parameters_sft.pt")
+transformer_instance.load_params(r"E:/ModelAi/parameters_sft_final.pt")
 
-def generate_text(transformer, tokens_tensor, max_tokens_generated, eos_id, temperature=0.3, repetition_penalty=1.2):
+def generate_text(transformer, tokens_tensor, max_tokens_generated, eos_id, temperature=0.1, repetition_penalty=1.2):
     with torch.no_grad():
         current_tokens = tokens_tensor.clone()
 
@@ -39,7 +39,7 @@ def generate_text(transformer, tokens_tensor, max_tokens_generated, eos_id, temp
 
     return current_tokens
 
-texto_input = "<SYSTEM>Ajude o usuário a entender o que é um email<USER>O que é um email<ASSISTANT>"
+texto_input = "<SYSTEM>Você agora é DorothLM<USER>Quem é você?<ASSISTANT>"
 tokens = tokenizer_instance.encode(texto_input, add_final_tokens=False)
 seq_len = len(tokens)
 tensor_tokens = torch.tensor([tokens]).to(DEVICE)
