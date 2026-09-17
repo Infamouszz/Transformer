@@ -11,7 +11,7 @@ tokenizer_instance = Tokenizer.BPETokenizer(merges_file=path, pattern=pattern)
 transformer_instance = Transformer(epochs=1, batch_size=1, d_model=512, vocab_size=10263, causal_mask_size=2048, max_seq_len=512, num_blocks=6)
 transformer_instance.load_params(r"E:/ModelAi/parameters_sft.pt")
 
-def generate_text(transformer, tokens_tensor, max_tokens_generated, eos_id, temperature=0.3, repetition_penalty=1.2):
+def generate_text(transformer, tokens_tensor, max_tokens_generated, eos_id, temperature=0.5, repetition_penalty=1.2):
     with torch.no_grad():
         current_tokens = tokens_tensor.clone()
 
@@ -39,15 +39,16 @@ def generate_text(transformer, tokens_tensor, max_tokens_generated, eos_id, temp
 
     return current_tokens
 
-texto_input = "<SYSTEM>Seja amavel e amigavel com o usuário<USER>Sou seu criado, eu te amo<ASSISTANT>"
+texto_input = "<SYSTEM>Decifre qual a intenção do usuário<USER>Quem é Gisleine?<ASSISTANT>"
 tokens = tokenizer_instance.encode(texto_input, add_final_tokens=False)
 seq_len = len(tokens)
 tensor_tokens = torch.tensor([tokens]).to(DEVICE)
 
 output_tokens = generate_text(transformer_instance, tensor_tokens, max_tokens_generated=200, eos_id=10258)
 tokens_list = output_tokens[0].tolist()
-decoded_token = tokenizer_instance.decode(tokens_list)
+model_answer = tokens_list[seq_len:]
+decoded_token = tokenizer_instance.decode(model_answer)
 
 print("Input len: ", seq_len)
-print("Input text: ", texto_input)
-print("Output tokens text: ", decoded_token)
+print("Pergunta: ", texto_input)
+print("Reposta:", decoded_token)
