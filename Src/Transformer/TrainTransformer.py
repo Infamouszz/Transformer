@@ -3,7 +3,6 @@ from Src.Transformer.DatasetPreLoader import DataLoaderPackerLocal
 from Src.Transformer.Optimizer.AdamOpimizer import AdamOptimizer
 from Src.Transformer.Settings.Config import DEVICE
 from Src.Transformer.Transformer import Transformer
-from tqdm import tqdm
 
 transformer = Transformer(epochs=1, batch_size=16, d_model=512, vocab_size=10263, causal_mask_size=2048, max_seq_len=512, num_blocks=6)
 transformer.to(DEVICE)
@@ -12,6 +11,7 @@ total_steps = dataloader.get_max_steps() * transformer.epochs
 optimizer = AdamOptimizer(parameters=transformer.get_params(), alpha=3e-4, total_steps=total_steps)
 
 steps = 0
+
 transformer.load_params(r"/kaggle/working/parameters_fixed_final.pt")
 print("Parameters loaded")
 print("Training started")
