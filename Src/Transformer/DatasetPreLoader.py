@@ -12,6 +12,7 @@ class DataLoaderPackerLocal:
             try:
                 data = torch.load(fp, map_location="cpu", weights_only=True)
                 self.data_cache.append(data)
+                print(f"Arquivo {fp} carregado com sucesso")
             except FileNotFoundError:
                 print(f"Arquivo {fp} não encontrado, pulando...")
 
