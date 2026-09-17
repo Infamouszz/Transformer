@@ -12,7 +12,7 @@ optimizer = AdamOptimizer(parameters=transformer.get_params(), alpha=3e-4, total
 
 steps = 0
 
-transformer.load_params(r"/kaggle/working/parameters_fixed_final.pt")
+transformer.load_params(r"/kaggle/working/parameters_sft.pt")
 print("Parameters loaded")
 print("Training started")
 for e in range(transformer.epochs):
@@ -48,5 +48,5 @@ for e in range(transformer.epochs):
                 print(f"Loss: {loss.item():} | Steps: {steps} | Total steps: {total_steps} | Epochs: {e} | Learning Rate: {optimizer.cosine_decay_warmup(steps, total_steps)}")
 
 print("Training finished")
-transformer.save_params(r"/kaggle/working/parameters_sft.pt")
+transformer.save_params(r"/kaggle/working/parameters_sft_final.pt")
 print("Parameters saved")
