@@ -17,6 +17,7 @@ print("Parameters loaded")
 print("Training started")
 for e in range(transformer.epochs):
     with torch.no_grad():
+        print(f"Epoch {e}")
         for X, Y in dataloader.load():
             X = X.to(DEVICE)
             Y = Y.to(DEVICE)
